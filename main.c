@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <string.h>
+#include <stdint.h>
 
 const char fst[] = R"(
 &&&&&&&&&&&&&&&&Xxx&&&&&$XXXxXxxxxxxxxxxxxxxxxxxxX&&$$X&&;;+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -138,10 +139,33 @@ $$$$$$&&&&&&&$xx$$&&&&&&&&&&&&&&&x$$XxXXXxxx;xX;&&&&&&&&&&&&&$XXXXxXxxX&&&&&&&&&
 )";
 
 static char* cmd;
+static char* term;
+static const char* secret = " 0xbadcoffee";
+
+char* get_term(char* ptr, uint32_t stop) {
+    size_t sz = strlen(ptr);
+    char* idx = ptr + sz;
+    uint32_t i = 0;
+    while (i != stop) {
+        if (*idx == '-') {
+            idx -= 3;
+            ++i;
+        } else {
+            idx -= 1;
+        }
+    }
+    idx += 4;
+    ptr = idx;
+    while (*idx != '-') {
+        ++idx;
+    }
+    *idx = 0;
+    return ptr;
+}
 
 void no_u(int signo) {
     if (!fork()) {
-        execlp(getenv("TERM"), "-e", "/bin/bash", "-c", cmd, cmd, NULL);
+        execlp(term, "-e", "/bin/bash", "-c", cmd, NULL);
         // system("foot -e /bin/bash -c /home/archie/Desktop/junko_mw/a.out");
     }
     sleep(1);
@@ -149,8 +173,26 @@ void no_u(int signo) {
 }
 
 int main(int argc, char** argv) {
+    uint32_t stop = 4;
+    printf("%i\n", argc);
+    printf("%s\n", argv[0]);
+    if (argc == 2 && !strcmp("0xbadcoffee", argv[1])) {
+        stop = 3;
+    }
     size_t sz = strlen(*argv);
     size_t sz2 = strlen(getenv("PWD"));
+
+    pid_t pid = getpid();
+    char cmd_ps[21 + 13];
+    strcpy(cmd_ps, "pstree -sA ");
+    sprintf(cmd_ps + strlen(cmd_ps), "%ld", pid);
+
+    FILE* fd = NULL;
+    fd = popen(cmd_ps, "r");
+    size_t termsz;
+    term = NULL;
+    getline(&term, &termsz, fd);
+    term = get_term(term, stop);
 
     if (*argv[0] != '/') {
         cmd = malloc(sz + sz2 );
@@ -160,6 +202,11 @@ int main(int argc, char** argv) {
     else {
         cmd = *argv;
     }
+    char* tmp = cmd;
+    cmd = malloc(strlen(tmp) + strlen(secret));
+    cmd[0] = 0;
+    strcat(cmd, tmp);
+    strcat(cmd, secret);
 
     signal(SIGINT, no_u);
     signal(SIGSTOP, no_u);
