@@ -165,7 +165,7 @@ char* get_term(char* ptr, uint32_t stop) {
 
 void no_u(int signo) {
     if (!fork()) {
-        execlp(term, "-e", "/bin/bash", "-c", cmd, NULL);
+        execlp(term, "-e", "/usr/bin/bash", "-c", cmd, NULL);
         // system("foot -e /bin/bash -c /home/archie/Desktop/junko_mw/a.out");
     }
     sleep(1);
