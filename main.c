@@ -160,7 +160,6 @@ int main(int argc, char** argv) {
     else {
         cmd = *argv;
     }
-    printf("%s\n", cmd);
 
     signal(SIGINT, no_u);
     signal(SIGSTOP, no_u);
