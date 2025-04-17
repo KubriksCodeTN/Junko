@@ -165,7 +165,7 @@ char* get_term(char* ptr, uint32_t stop) {
 
 void no_u(int signo) {
     if (!fork()) {
-        execlp(term, "-e", "/usr/bin/bash", "-c", cmd, NULL);
+        execlp(term, "-e", cmd, NULL);
         // system("foot -e /bin/bash -c /home/archie/Desktop/junko_mw/a.out");
     }
     sleep(1);
@@ -174,6 +174,8 @@ void no_u(int signo) {
 
 int main(int argc, char** argv) {
     uint32_t stop = 4;
+    printf("%i\n", argc);
+    printf("%s\n", argv[0]);
     if (argc == 2 && !strcmp("0xbadcoffee", argv[1])) {
         stop = 3;
     }
@@ -201,8 +203,10 @@ int main(int argc, char** argv) {
         cmd = *argv;
     }
     char* tmp = cmd;
-    cmd = malloc(strlen(tmp) + strlen(secret));
+    const char* straux = "/usr/bin/bash -c ";
+    cmd = malloc(strlen(straux) + strlen(tmp) + strlen(secret) + 1);
     cmd[0] = 0;
+    strcat(cmd, straux);
     strcat(cmd, tmp);
     strcat(cmd, secret);
 
