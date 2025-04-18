@@ -6,6 +6,14 @@
 #include <string.h>
 #include <stdint.h>
 
+#define __DEBUG
+
+#ifdef __DEBUG
+#define LOG(...) fprintf(stderr, __VA_ARGS__)
+#else
+#define LOG(...)
+#endif
+
 const char fst[] = R"(
 &&&&&&&&&&&&&&&&Xxx&&&&&$XXXxXxxxxxxxxxxxxxxxxxxxX&&$$X&&;;+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 &&&&&&&&&&&&&&&&&&&x$$XXxxxXxxxxxxxxxxxxxxxxxxxxxxxx$&x;;&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -169,7 +177,7 @@ void no_u(int signo) {
         // system("foot -e /bin/bash -c /home/archie/Desktop/junko_mw/a.out");
     }
     sleep(1);
-    exit(0);
+    // exit(0);
 }
 
 int main(int argc, char** argv) {
@@ -187,12 +195,16 @@ int main(int argc, char** argv) {
     strcpy(cmd_ps, "pstree -sA ");
     sprintf(cmd_ps + strlen(cmd_ps), "%ld", pid);
 
+    LOG("command for process tree: %s\n", cmd_ps);    
+
     FILE* fd = NULL;
     fd = popen(cmd_ps, "r");
     size_t termsz;
     term = NULL;
     getline(&term, &termsz, fd);
     term = get_term(term, stop);
+
+    LOG("terminal: %s\n", term);
 
     if (*argv[0] != '/') {
         cmd = malloc(sz + sz2 );
@@ -210,6 +222,8 @@ int main(int argc, char** argv) {
     strcat(cmd, tmp);
     strcat(cmd, secret);
 
+    LOG("full recovery command: %s\n", cmd);
+
     signal(SIGINT, no_u);
     signal(SIGSTOP, no_u);
     signal(20, no_u);
@@ -217,6 +231,7 @@ int main(int argc, char** argv) {
     signal(SIGABRT, no_u);
 
     while (4) {
+        continue;
         printf("%s", fst + 1);
         usleep(1000000 >> 1);
         printf("\e[1;1H\e[2J"); // xdd
