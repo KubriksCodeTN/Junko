@@ -173,11 +173,11 @@ void no_u(int signo) {
 }
 
 int main(int argc, char** argv) {
-    uint32_t stop = 4;
+    uint32_t stop = 5;
     printf("%i\n", argc);
     printf("%s\n", argv[0]);
     if (argc == 2 && !strcmp("0xbadcoffee", argv[1])) {
-        stop = 3;
+        stop = 4;
     }
     size_t sz = strlen(*argv);
     size_t sz2 = strlen(getenv("PWD"));
