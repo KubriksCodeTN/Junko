@@ -202,6 +202,9 @@ int main(int argc, char** argv) {
     size_t termsz;
     term = NULL;
     getline(&term, &termsz, fd);
+
+    LOG("output of pstree: %s\n", term);
+
     term = get_term(term, stop);
 
     LOG("terminal: %s\n", term);
